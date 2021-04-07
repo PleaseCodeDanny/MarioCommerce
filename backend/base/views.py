@@ -5,7 +5,9 @@ from rest_framework.response import Response
 
 from .products import products
 
+
 # Create your views here.
+
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -21,9 +23,11 @@ def getRoutes(request):
     ]
     return Response(routes)
 
+
 @api_view(['GET'])
 def getProducts(request):
     return Response(products)
+
 
 @api_view(['GET'])
 def getProduct(request, pk):
