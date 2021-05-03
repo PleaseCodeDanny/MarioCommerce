@@ -101,7 +101,7 @@ def deleteUser(request, pk):
     userForDeletion = User.objects.get(id=pk)
     userForDeletion_id = userForDeletion.id
     userForDeletion.delete()
-    return Response(f'User {userForDeletion.username} with id: {userForDeletion_id} was deleted')
+    return Response({'detail': f'User {userForDeletion.username} with id: {userForDeletion_id} was deleted'})
 
 
 @api_view(['POST'])
