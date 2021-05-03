@@ -12,7 +12,8 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { getUserDetails } from "../actions/userActions";
+import { getUserDetails, updateUser } from "../actions/userActions";
+import { USER_UPDATE_SUCCESS } from "../constants/userConstants";
 
 function UserEditScreen({ match, history }) {
   const userId = match.params.id;
@@ -25,18 +26,31 @@ function UserEditScreen({ match, history }) {
   const userDetails = useSelector((state) => state.userDetails);
   const { loading, error, user } = userDetails;
 
+  const userUpdate = useSelector((state) => state.userUpdate);
+  const {
+    loading: loadingUpdateUser,
+    error: errorUpdateUser,
+    success: successUpdateUser,
+  } = userUpdate;
+
   //If we already have userInfo, someone has logged in already. Redirect to home page.
   useEffect(() => {
-    if (!user.name || user._id !== Number(userId)) {
-      dispatch(getUserDetails(userId));
+    if (successUpdateUser) {
+      dispatch({ type: USER_UPDATE_SUCCESS });
+      history.push("/admin/userlist");
     } else {
-      setName(user.name);
-      setEmail(user.email);
-      setIsAdmin(user.isAdmin);
+      if (!user.name || user._id !== Number(userId)) {
+        dispatch(getUserDetails(userId));
+      } else {
+        setName(user.name);
+        setEmail(user.email);
+        setIsAdmin(user.isAdmin);
+      }
     }
-  }, [history, user, userId, dispatch]);
+  }, [history, user, userId, dispatch, successUpdateUser]);
   const submitHandler = (e) => {
     e.preventDefault();
+    dispatch(updateUser({ _id: user._id, name, email, isAdmin }));
   };
 
   return (
@@ -44,6 +58,10 @@ function UserEditScreen({ match, history }) {
       <Link to={"/admin/userlist"}>Go Back</Link>
       <FormContainer>
         <h1>Edit User</h1>
+        {loadingUpdateUser && <Loader />}
+        {errorUpdateUser && (
+          <Message variant={"danger"}>{errorUpdateUser}</Message>
+        )}
         {loading ? (
           <Loader />
         ) : error ? (
