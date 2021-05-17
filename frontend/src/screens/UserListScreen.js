@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteUser, getUserList } from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { LinkContainer } from "react-router-bootstrap";
 import { Button, Table } from "react-bootstrap";
+import { USER_DELETE_RESET } from "../constants/userConstants";
 
 function UserListScreen({ history }) {
   const dispatch = useDispatch();
@@ -13,7 +13,10 @@ function UserListScreen({ history }) {
   const userLogin = useSelector((state) => state.userLogin);
   const userDelete = useSelector((state) => state.userDelete);
   const { userInfo } = userLogin;
-  const { success: successDelete } = userDelete;
+  const {
+    success: successDelete,
+    successMessage: successMessageDelete,
+  } = userDelete;
   const { loading, error, users } = userList;
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) {
@@ -21,7 +24,13 @@ function UserListScreen({ history }) {
     } else {
       dispatch(getUserList());
     }
-  }, [dispatch, history, successDelete, userInfo]);
+    if (successMessageDelete) {
+      const messageTimer = setTimeout(() => {
+        dispatch({ type: USER_DELETE_RESET });
+      }, 5000);
+      return () => clearTimeout(messageTimer);
+    }
+  }, [dispatch, history, successDelete, userInfo, successMessageDelete]);
 
   const deleteHandler = (user_id) => {
     if (
@@ -39,50 +48,58 @@ function UserListScreen({ history }) {
       ) : error ? (
         <Message variant={"danger"}>{error}</Message>
       ) : (
-        <Table striped bordered hover responsive className={"table-sm"}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>NAME</th>
-              <th>EMAIL</th>
-              <th>ADMIN</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user._id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  {user.isAdmin ? (
-                    <i className={"fas fa-check"} style={{ color: "green" }} />
-                  ) : (
-                    <i className={"fas fa-ban"} style={{ color: "red" }} />
-                  )}
-                </td>
-                <td>
-                  <LinkContainer
-                    to={`/admin/user/${user._id}/edit`}
-                    style={{ marginRight: "0.5rem" }}
-                  >
-                    <Button className={"btn-sm"}>
-                      <i className={"fas fa-edit"} />
-                    </Button>
-                  </LinkContainer>
-                  <Button
-                    variant={"danger"}
-                    className={"btn-sm"}
-                    onClick={() => deleteHandler(user._id)}
-                  >
-                    <i className={"fas fa-trash"} />
-                  </Button>
-                </td>
+        <Fragment>
+          {successMessageDelete && (
+            <Message variant={"success"}>{successMessageDelete}</Message>
+          )}
+          <Table striped bordered hover responsive className={"table-sm"}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th>ADMIN</th>
+                <th>ACTIONS</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user._id}>
+                  <td>{user._id}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    {user.isAdmin ? (
+                      <i
+                        className={"fas fa-check"}
+                        style={{ color: "green" }}
+                      />
+                    ) : (
+                      <i className={"fas fa-ban"} style={{ color: "red" }} />
+                    )}
+                  </td>
+                  <td>
+                    <LinkContainer
+                      to={`/admin/user/${user._id}/edit`}
+                      style={{ marginRight: "0.5rem" }}
+                    >
+                      <Button className={"btn-sm"}>
+                        <i className={"fas fa-edit"} />
+                      </Button>
+                    </LinkContainer>
+                    <Button
+                      variant={"danger"}
+                      className={"btn-sm"}
+                      onClick={() => deleteHandler(user._id)}
+                    >
+                      <i className={"fas fa-trash"} />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Fragment>
       )}
     </Fragment>
   );
