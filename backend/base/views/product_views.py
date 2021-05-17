@@ -35,11 +35,13 @@ def createProduct(request):
     )
 
     serializer = ProductSerializer(product, many=False)
-    return Response(serializer.data)
+    return Response(
+        {'product': serializer.data, 'detail': f'Product "{product.name}" has been created with id: {product._id}'})
+
 
 @api_view(['PUT'])
 @permission_classes(['IsAdminUser'])
-def updateProduct(request,pk):
+def updateProduct(request, pk):
     data = request.data
     product = Product.objects.get(_id=pk)
     product.name = data['name']

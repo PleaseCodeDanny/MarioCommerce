@@ -4,10 +4,17 @@ import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { LinkContainer } from "react-router-bootstrap";
 import { Button, Col, Row, Table } from "react-bootstrap";
-import { deleteProduct, listProducts } from "../actions/productActions";
-import { PRODUCT_DELETE_RESET } from "../constants/productConstants";
+import {
+  createProduct,
+  deleteProduct,
+  listProducts,
+} from "../actions/productActions";
+import {
+  PRODUCT_CREATE_RESET,
+  PRODUCT_DELETE_RESET,
+} from "../constants/productConstants";
 
-function ProductListScreen({ history, match }) {
+function ProductListScreen({ history }) {
   const dispatch = useDispatch();
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
@@ -19,23 +26,46 @@ function ProductListScreen({ history, match }) {
     error: errorDelete,
   } = productDelete;
 
+  const productCreate = useSelector((state) => state.productCreate);
+  const {
+    loading: loadingCreate,
+    success: successCreate,
+    error: errorCreate,
+    product: createdProduct,
+  } = productCreate;
+
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
+  //TODO USE CUSTOM HOOKS ASSHOLE (me) !!!!!
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) {
       history.push("/login");
+    }
+    if (successCreate) {
+      dispatch({ type: PRODUCT_CREATE_RESET });
+      history.push(`/admin/product/${createdProduct._id}/edit`);
     } else {
       dispatch(listProducts());
     }
-    let timer;
+
+    let timerDelete;
     if (successDelete) {
-      timer = setTimeout(() => {
+      timerDelete = setTimeout(() => {
         dispatch({ type: PRODUCT_DELETE_RESET });
       }, 5000);
     }
-    return () => clearTimeout(timer);
-  }, [dispatch, history, userInfo, successDelete]);
+    return () => {
+      clearTimeout(timerDelete);
+    };
+  }, [
+    dispatch,
+    history,
+    userInfo,
+    successDelete,
+    createdProduct,
+    successCreate,
+  ]);
 
   const deleteHandler = (product_id) => {
     if (
@@ -46,7 +76,10 @@ function ProductListScreen({ history, match }) {
       dispatch(deleteProduct(product_id));
     }
   };
-  const createProductHandler = (product) => {};
+  const createProductHandler = (product) => {
+    dispatch(createProduct());
+  };
+
   return (
     <Fragment>
       <Row className={"align-items-center"}>
@@ -60,9 +93,15 @@ function ProductListScreen({ history, match }) {
           </Button>
         </Col>
       </Row>
+
       {loadingDelete && <Loader />}
-      {errorDelete && <Message variant={"danger"}>{error}</Message>}
+      {errorDelete && <Message variant={"danger"}>{errorDelete}</Message>}
       {successDelete && <Message variant={"success"}>{successDelete}</Message>}
+
+      {loadingCreate && <Loader />}
+      {errorCreate && <Message variant={"danger"}>{errorCreate}</Message>}
+      {successCreate && <Message variant={"success"}>{successCreate}</Message>}
+
       {loading ? (
         <Loader />
       ) : error ? (
