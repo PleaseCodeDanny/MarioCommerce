@@ -4,6 +4,7 @@ import { Nav, Navbar, NavDropdown, NavLink } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../actions/userActions";
+import SearchBox from "./SearchBox";
 
 let NavbarComponents = ({ userInfo, logoutHandler }) => {
   return (
@@ -64,6 +65,7 @@ let Header = () => {
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
+          <SearchBox />
           <Nav className="">
             <NavbarComponents
               userInfo={userInfo}
