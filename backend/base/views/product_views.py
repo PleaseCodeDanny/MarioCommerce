@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from base.models import Product, Review
 from base.serializers import ProductSerializer
@@ -13,8 +14,21 @@ def getProducts(request):
     if query is None:
         query = ''
     products = Product.objects.filter(name__icontains=query)
+    page = request.query_params.get('page')
+    p = Paginator(products, 2)
+
+    try:
+        products = p.page(page)
+    except PageNotAnInteger:
+        products = p.page(1)
+    except EmptyPage:
+        products = p.page(p.num_pages)
+
+    if page is None:
+        page = 1
+    page = int(page)
     serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+    return Response({'products': serializer.data, 'page': page, 'pages': p.num_pages})
 
 
 @api_view(['GET'])
