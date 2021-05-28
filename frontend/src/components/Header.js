@@ -9,22 +9,21 @@ import SearchBox from "./SearchBox";
 let NavbarComponents = ({ userInfo, logoutHandler }) => {
   return (
     <Fragment>
-      <LinkContainer to="/cart">
+      <LinkContainer to="/cart" className={"px-2"}>
         <NavLink>
           <i className="fas fa-shopping-cart" />
-          MarioKart
         </NavLink>
       </LinkContainer>
 
       {userInfo && Object.keys(userInfo).length >= 1 ? (
-        <NavDropdown id={"username"} title={userInfo.name}>
+        <NavDropdown id={"username"} title={userInfo.name} className={"px-2"}>
           <LinkContainer to={"/profile"}>
             <NavDropdown.Item>Profile</NavDropdown.Item>
           </LinkContainer>
           <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
         </NavDropdown>
       ) : (
-        <LinkContainer to="/login">
+        <LinkContainer to="/login" className={"px-2"}>
           <NavLink>
             <i className="fas fa-user" />
             Login
@@ -59,20 +58,15 @@ let Header = () => {
   return (
     <header>
       <Navbar bg="dark" variant="primary" expand="lg">
-        <LinkContainer to="/">
-          <Navbar.Brand>MarioShop</Navbar.Brand>
-        </LinkContainer>
-
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        <div className={"home-search-container"}>
+          <LinkContainer to="/">
+            <Navbar.Brand>MarioShop</Navbar.Brand>
+          </LinkContainer>
           <SearchBox isAdmin={userInfo.isAdmin} />
-          <Nav className="">
-            <NavbarComponents
-              userInfo={userInfo}
-              logoutHandler={logoutHandler}
-            />
-          </Nav>
-        </Navbar.Collapse>
+        </div>
+        <Nav className="user-menu-container">
+          <NavbarComponents userInfo={userInfo} logoutHandler={logoutHandler} />
+        </Nav>
       </Navbar>
     </header>
   );
