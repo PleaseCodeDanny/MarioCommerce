@@ -65,7 +65,7 @@ let Header = () => {
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <SearchBox />
+          <SearchBox isAdmin={userInfo.isAdmin} />
           <Nav className="">
             <NavbarComponents
               userInfo={userInfo}
