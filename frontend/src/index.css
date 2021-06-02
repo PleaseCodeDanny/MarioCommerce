@@ -24,7 +24,7 @@ h3{
     flex-direction: row!important;
 }
 
-div[class^="navbar-expand"], div[class*=" navbar-expand"]{
+div[class^="navbar-expand"], div[class*=" navbar-expand"], .navbar-expand-lg, .navbar-expand-xl{
     justify-content: space-between;
 }
 
