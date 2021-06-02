@@ -62,7 +62,7 @@ let Header = () => {
           <LinkContainer to="/">
             <Navbar.Brand>MarioShop</Navbar.Brand>
           </LinkContainer>
-          <SearchBox isAdmin={userInfo.isAdmin} />
+          <SearchBox isAdmin={userInfo ? userInfo.isAdmin : false} />
         </div>
         <Nav className="user-menu-container">
           <NavbarComponents userInfo={userInfo} logoutHandler={logoutHandler} />
